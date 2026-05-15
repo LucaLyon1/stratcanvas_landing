@@ -25,7 +25,6 @@ export default function LeadMagnetPage() {
       <div className="h-[100px]" aria-hidden />
 
       <main className="relative z-[1] mx-auto max-w-[720px] px-6 py-16 sm:px-8 lg:py-24">
-        <p className="mb-4 font-mono text-[0.72rem] uppercase tracking-[0.1em] text-strat-accent">Lead magnet</p>
         <h1 className="mb-4 font-serif text-[clamp(2rem,5vw,3.25rem)] leading-tight tracking-tight">
           The <em className="italic text-strat-accent">Visual Algo Starter</em> Checklist (PDF outline)
         </h1>
