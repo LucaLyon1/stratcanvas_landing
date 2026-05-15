@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
+import { Icon, type IconName } from "@/components/site/Icon";
 
 export function CanvasMockup() {
   return (
@@ -20,64 +21,31 @@ export function CanvasMockup() {
             <div className="mb-2 mt-3 px-1 text-[0.65rem] uppercase tracking-[0.1em] text-strat-muted first:mt-0">
               Indicators
             </div>
-            <div className="flex flex-col gap-1">
-              {[
-                { icon: "📈", label: "EMA Crossover", c: "bg-strat-accent/12 text-strat-accent" },
-                { icon: "〰️", label: "RSI", c: "bg-strat-accent/12 text-strat-accent" },
-                { icon: "🔻", label: "Bollinger Bands", c: "bg-strat-accent/12 text-strat-accent" },
-                { icon: "📊", label: "MACD", c: "bg-strat-accent2/12 text-strat-accent2" },
-                { icon: "⚡", label: "ATR", c: "bg-strat-accent2/12 text-strat-accent2" },
-              ].map((b) => (
-                <button
-                  type="button"
-                  key={b.label}
-                  className="flex items-center gap-2 rounded-md px-2 py-[0.45rem] text-left text-[0.78rem] text-strat-muted transition hover:bg-strat-surface hover:text-strat-text"
-                >
-                  <span className={`flex size-[22px] shrink-0 items-center justify-center rounded text-[11px] ${b.c}`}>
-                    {b.icon}
-                  </span>
-                  {b.label}
-                </button>
-              ))}
-            </div>
+            <PaletteGroup
+              items={[
+                { icon: "candlestick", label: "EMA Crossover", c: "bg-strat-accent/12 text-strat-accent" },
+                { icon: "wave", label: "RSI", c: "bg-strat-accent/12 text-strat-accent" },
+                { icon: "bands", label: "Bollinger Bands", c: "bg-strat-accent/12 text-strat-accent" },
+                { icon: "bars", label: "MACD", c: "bg-strat-accent2/12 text-strat-accent2" },
+                { icon: "bolt", label: "ATR", c: "bg-strat-accent2/12 text-strat-accent2" },
+              ]}
+            />
             <div className="mb-2 mt-3 px-1 text-[0.65rem] uppercase tracking-[0.1em] text-strat-muted">Logic</div>
-            <div className="flex flex-col gap-1">
-              {[
-                { icon: "🔀", label: "Condition", c: "bg-strat-accent3/12 text-strat-accent3" },
-                { icon: "⚙️", label: "Filter", c: "bg-strat-accent3/12 text-strat-accent3" },
-                { icon: "💰", label: "Order", c: "bg-strat-gold/12 text-strat-gold" },
-                { icon: "🛡", label: "Stop Loss", c: "bg-strat-gold/12 text-strat-gold" },
-              ].map((b) => (
-                <button
-                  type="button"
-                  key={b.label}
-                  className="flex items-center gap-2 rounded-md px-2 py-[0.45rem] text-left text-[0.78rem] text-strat-muted transition hover:bg-strat-surface hover:text-strat-text"
-                >
-                  <span className={`flex size-[22px] shrink-0 items-center justify-center rounded text-[11px] ${b.c}`}>
-                    {b.icon}
-                  </span>
-                  {b.label}
-                </button>
-              ))}
-            </div>
+            <PaletteGroup
+              items={[
+                { icon: "split", label: "Condition", c: "bg-strat-accent3/12 text-strat-accent3" },
+                { icon: "settings", label: "Filter", c: "bg-strat-accent3/12 text-strat-accent3" },
+                { icon: "wallet", label: "Order", c: "bg-strat-gold/12 text-strat-gold" },
+                { icon: "shield-alt", label: "Stop Loss", c: "bg-strat-gold/12 text-strat-gold" },
+              ]}
+            />
             <div className="mb-2 mt-3 px-1 text-[0.65rem] uppercase tracking-[0.1em] text-strat-muted">Data</div>
-            <div className="flex flex-col gap-1">
-              {[
-                { icon: "💹", label: "Market Feed" },
-                { icon: "📰", label: "News Signal" },
-              ].map((b) => (
-                <button
-                  type="button"
-                  key={b.label}
-                  className="flex items-center gap-2 rounded-md px-2 py-[0.45rem] text-left text-[0.78rem] text-strat-muted transition hover:bg-strat-surface hover:text-strat-text"
-                >
-                  <span className="flex size-[22px] shrink-0 items-center justify-center rounded bg-strat-accent2/12 text-[11px] text-strat-accent2">
-                    {b.icon}
-                  </span>
-                  {b.label}
-                </button>
-              ))}
-            </div>
+            <PaletteGroup
+              items={[
+                { icon: "activity", label: "Market Feed", c: "bg-strat-accent2/12 text-strat-accent2" },
+                { icon: "newspaper", label: "News Signal", c: "bg-strat-accent2/12 text-strat-accent2" },
+              ]}
+            />
           </div>
 
           {/* Canvas */}
@@ -193,6 +161,31 @@ export function CanvasMockup() {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+type PaletteItem = { icon: IconName; label: string; c: string };
+
+function PaletteGroup({ items }: { items: PaletteItem[] }) {
+  return (
+    <div className="flex flex-col gap-1">
+      {items.map((b) => (
+        <button
+          type="button"
+          key={b.label}
+          tabIndex={-1}
+          aria-hidden
+          className="flex items-center gap-2 rounded-md px-2 py-[0.45rem] text-left text-[0.78rem] text-strat-muted transition hover:bg-strat-surface hover:text-strat-text"
+        >
+          <span
+            className={`flex size-[22px] shrink-0 items-center justify-center rounded ${b.c}`}
+          >
+            <Icon name={b.icon} className="size-3.5" />
+          </span>
+          {b.label}
+        </button>
+      ))}
     </div>
   );
 }

@@ -16,13 +16,27 @@ const tickers = [
 export function Ticker() {
   const doubled = [...tickers, ...tickers];
   return (
-    <div className="relative z-[1] overflow-hidden border-y border-white/[0.07] bg-strat-bg2 py-[0.9rem]">
+    <div
+      aria-hidden
+      className="relative z-[1] overflow-hidden border-y border-white/[0.07] bg-strat-bg2 py-[0.9rem]"
+      style={{
+        maskImage:
+          "linear-gradient(to right, transparent, black 6%, black 94%, transparent)",
+        WebkitMaskImage:
+          "linear-gradient(to right, transparent, black 6%, black 94%, transparent)",
+      }}
+    >
       <div className="flex animate-ticker gap-12 whitespace-nowrap">
         {doubled.map((t, i) => (
-          <span key={`${t.sym}-${i}`} className="inline-flex shrink-0 items-center gap-2 font-mono text-[0.78rem] text-strat-muted">
-            <span>{t.sym}</span>
+          <span
+            key={`${t.sym}-${i}`}
+            className="inline-flex shrink-0 items-center gap-2 font-mono text-[0.78rem] text-strat-muted"
+          >
+            <span className="text-strat-text/80">{t.sym}</span>
             <span>{t.val}</span>
-            <span className={t.up ? "text-strat-accent" : "text-red-400"}>{t.chg}</span>
+            <span className={t.up ? "text-strat-accent" : "text-red-400"}>
+              {t.chg}
+            </span>
           </span>
         ))}
       </div>

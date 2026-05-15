@@ -1,16 +1,16 @@
 import { NextResponse } from "next/server";
-import { upsertSubscriber, type SubscribeSource } from "@/lib/mailchimp";
+import { upsertContact, type SubscribeSource } from "@/lib/loops";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function POST(req: Request) {
-  const apiKey = process.env.MAILCHIMP_API_KEY;
-  const serverPrefix = process.env.MAILCHIMP_SERVER_PREFIX;
-  const audienceId = process.env.MAILCHIMP_AUDIENCE_ID;
+  const apiKey = process.env.LOOPS_API_KEY;
+  const waitlistMailingListId = process.env.LOOPS_WAITLIST_LIST_ID;
+  const leadMagnetMailingListId = process.env.LOOPS_LEAD_MAGNET_LIST_ID;
 
-  if (!apiKey || !serverPrefix || !audienceId) {
+  if (!apiKey) {
     return NextResponse.json(
-      { error: "Mailchimp is not configured on the server." },
+      { error: "Loops is not configured on the server." },
       { status: 500 }
     );
   }
@@ -30,19 +30,25 @@ export async function POST(req: Request) {
   const source = (body as { source?: unknown }).source;
 
   if (typeof email !== "string" || !emailRegex.test(email.trim())) {
-    return NextResponse.json({ error: "Please enter a valid email address." }, { status: 400 });
+    return NextResponse.json(
+      { error: "Please enter a valid email address." },
+      { status: 400 }
+    );
   }
 
   if (source !== "waitlist" && source !== "lead_magnet") {
-    return NextResponse.json({ error: "Invalid subscription source." }, { status: 400 });
+    return NextResponse.json(
+      { error: "Invalid subscription source." },
+      { status: 400 }
+    );
   }
 
-  const result = await upsertSubscriber({
+  const result = await upsertContact({
     apiKey,
-    serverPrefix,
-    audienceId,
     email: email.trim(),
     source: source as SubscribeSource,
+    waitlistMailingListId,
+    leadMagnetMailingListId,
   });
 
   if (!result.ok) {

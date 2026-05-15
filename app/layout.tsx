@@ -58,6 +58,9 @@ export default function RootLayout({
           aria-hidden
           className="pointer-events-none fixed bottom-[20%] -left-[150px] z-0 size-[400px] rounded-full bg-strat-accent2 opacity-[0.08] blur-[100px]"
         />
+        <a href="#main" className="skip-link">
+          Skip to content
+        </a>
         {children}
       </body>
     </html>
