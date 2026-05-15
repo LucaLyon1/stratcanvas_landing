@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StratCanvas — Build & Backtest Trading Strategies Visually</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap');
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #0a0d12;
+            --bg2: #0f1319;
+            --bg3: #151b24;
+            --surface: #1a2230;
+            --border: rgba(255, 255, 255, 0.07);
+            --border2: rgba(255, 255, 255, 0.13);
+            --text: #e8edf5;
+            --muted: #7a8899;
+            --accent: #00e5a0;
+            --accent2: #0af;
+            --accent3: #ff6b35;
+            --gold: #f4c842;
+            --serif: 'DM Serif Display', Georgia, serif;
+            --sans: 'Outfit', sans-serif;
+            --mono: 'DM Mono', monospace;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--sans);
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* GRID BACKGROUND */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(0, 229, 160, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 229, 160, 0.03) 1px, transparent 1px);
+            background-size: 48px 48px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* NAV */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.1rem 3rem;
+            background: rgba(10, 13, 18, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            font-family: var(--serif);
+            font-size: 1.4rem;
+            color: var(--text);
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 12px var(--accent);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 400;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--text);
+        }
+
+        .nav-cta {
+            background: var(--accent);
+            color: #0a0d12;
+            padding: 0.5rem 1.3rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+
+        .nav-cta:hover {
+            opacity: 0.88;
+        }
+
+        /* HERO */
+        .hero {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 8rem 2rem 4rem;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 229, 160, 0.08);
+            border: 1px solid rgba(0, 229, 160, 0.2);
+            color: var(--accent);
+            font-size: 0.78rem;
+            font-weight: 500;
+            font-family: var(--mono);
+            padding: 0.35rem 0.9rem;
+            border-radius: 100px;
+            margin-bottom: 2rem;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        h1 {
+            font-family: var(--serif);
+            font-size: clamp(3rem, 6vw, 5.5rem);
+            line-height: 1.05;
+            letter-spacing: -0.02em;
+            color: var(--text);
+            max-width: 14ch;
+            margin: 0 auto 1.5rem;
+        }
+
+        h1 em {
+            font-style: italic;
+            color: var(--accent);
+        }
+
+        .hero-sub {
+            font-size: 1.15rem;
+            color: var(--muted);
+            max-width: 48ch;
+            margin: 0 auto 2.5rem;
+            line-height: 1.7;
+            font-weight: 300;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #0a0d12;
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 30px rgba(0, 229, 160, 0.25);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text);
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            text-decoration: none;
+            border: 1px solid var(--border2);
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-ghost:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .hero-proof {
+            margin-top: 3rem;
+            font-size: 0.82rem;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            justify-content: center;
+        }
+
+        .hero-proof span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* CANVAS PREVIEW */
+        .canvas-preview {
+            position: relative;
+            z-index: 1;
+            margin: 0 auto;
+            max-width: 1100px;
+            padding: 0 2rem 6rem;
+        }
+
+        .canvas-frame {
+            background: var(--bg3);
+            border: 1px solid var(--border2);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 40px 120px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.04);
+        }
+
+        .canvas-topbar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.7rem 1.2rem;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg2);
+        }
+
+        .traffic-lights {
+            display: flex;
+            gap: 6px;
+        }
+
+        .tl {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .tl.red {
+            background: #ff5f56;
+        }
+
+        .tl.yellow {
+            background: #ffbd2e;
+        }
+
+        .tl.green {
+            background: #27c93f;
+        }
+
+        .canvas-title {
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            color: var(--muted);
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .canvas-inner {
+            display: grid;
+            grid-template-columns: 220px 1fr 200px;
+            min-height: 440px;
+        }
+
+        /* LEFT PANEL */
+        .panel-left {
+            border-right: 1px solid var(--border);
+            padding: 1rem;
+        }
+
+        .panel-section-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--muted);
+            margin-bottom: 0.6rem;
+            margin-top: 0.8rem;
+            padding: 0 0.3rem;
+        }
+
+        .block-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .block-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.45rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .block-item:hover {
+            background: var(--surface);
+            color: var(--text);
+        }
+
+        .block-icon {
+            width: 22px;
+            height: 22px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            flex-shrink: 0;
+        }
+
+        .bi-green {
+            background: rgba(0, 229, 160, 0.12);
+            color: var(--accent);
+        }
+
+        .bi-blue {
+            background: rgba(0, 170, 255, 0.12);
+            color: var(--accent2);
+        }
+
+        .bi-orange {
+            background: rgba(255, 107, 53, 0.12);
+            color: var(--accent3);
+        }
+
+        .bi-gold {
+            background: rgba(244, 200, 66, 0.12);
+            color: var(--gold);
+        }
+
+        /* CENTER CANVAS */
+        .canvas-area {
+            position: relative;
+            background: var(--bg);
+            overflow: hidden;
+        }
+
+        .canvas-area svg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* NODE CARDS ON CANVAS */
+        .nodes-layer {
+            position: absolute;
+            inset: 0;
+        }
+
+        .node {
+            position: absolute;
+            background: var(--bg3);
+            border: 1px solid var(--border2);
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 0.73rem;
+            min-width: 130px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .node-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: var(--text);
+            font-size: 0.75rem;
+        }
+
+        .node-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .nd-green {
+            background: var(--accent);
+        }
+
+        .nd-blue {
+            background: var(--accent2);
+        }
+
+        .nd-orange {
+            background: var(--accent3);
+        }
+
+        .nd-gold {
+            background: var(--gold);
+        }
+
+        .node-param {
+            display: flex;
+            justify-content: space-between;
+            color: var(--muted);
+            font-family: var(--mono);
+            font-size: 0.68rem;
+            line-height: 1.8;
+        }
+
+        .node-param .val {
+            color: var(--accent2);
+        }
+
+        .node-active {
+            border-color: rgba(0, 229, 160, 0.4);
+            box-shadow: 0 0 0 2px rgba(0, 229, 160, 0.12), 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        /* RIGHT PANEL */
+        .panel-right {
+            border-left: 1px solid var(--border);
+            padding: 1rem;
+        }
+
+        .stat-mini {
+            background: var(--surface);
+            border-radius: 6px;
+            padding: 0.6rem 0.7rem;
+            margin-bottom: 6px;
+        }
+
+        .stat-mini-label {
+            font-size: 0.63rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 2px;
+        }
+
+        .stat-mini-val {
+            font-family: var(--mono);
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--accent);
+        }
+
+        .stat-mini-val.neg {
+            color: #ff6b6b;
+        }
+
+        .mini-chart {
+            height: 36px;
+            margin-top: 0.5rem;
+        }
+
+        /* SECTIONS */
+        section {
+            position: relative;
+            z-index: 1;
+            padding: 6rem 2rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .section-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--mono);
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+
+        .section-label::before {
+            content: '';
+            width: 20px;
+            height: 1px;
+            background: var(--accent);
+            display: inline-block;
+        }
+
+        h2 {
+            font-family: var(--serif);
+            font-size: clamp(2rem, 4vw, 3rem);
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            max-width: 20ch;
+            margin-bottom: 1rem;
+        }
+
+        h2 em {
+            font-style: italic;
+            color: var(--muted);
+        }
+
+        .section-sub {
+            color: var(--muted);
+            font-size: 1.05rem;
+            font-weight: 300;
+            max-width: 45ch;
+            margin-bottom: 3rem;
+            line-height: 1.7;
+        }
+
+        /* FEATURES GRID */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        .feature-card {
+            background: var(--bg);
+            padding: 2rem;
+            transition: background 0.2s;
+        }
+
+        .feature-card:hover {
+            background: var(--bg3);
+        }
+
+        .feature-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        .feature-card p {
+            font-size: 0.875rem;
+            color: var(--muted);
+            line-height: 1.65;
+        }
+
+        /* NAMES SECTION */
+        .names-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .name-card {
+            background: var(--bg3);
+            border: 1px solid var(--border2);
+            border-radius: 14px;
+            padding: 1.75rem;
+            transition: all 0.2s;
+            cursor: default;
+        }
+
+        .name-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 1px rgba(0, 229, 160, 0.15);
+        }
+
+        .name-card.featured {
+            border-color: rgba(0, 229, 160, 0.35);
+            background: linear-gradient(135deg, rgba(0, 229, 160, 0.04), var(--bg3));
+        }
+
+        .name-tag {
+            font-family: var(--mono);
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 3px 8px;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+
+        .tag-best {
+            background: rgba(0, 229, 160, 0.1);
+            color: var(--accent);
+        }
+
+        .tag-alt {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--muted);
+        }
+
+        .name-card h3 {
+            font-family: var(--serif);
+            font-size: 2rem;
+            margin-bottom: 0.3rem;
+            letter-spacing: -0.02em;
+        }
+
+        .domain {
+            font-family: var(--mono);
+            font-size: 0.8rem;
+            color: var(--accent);
+            margin-bottom: 0.8rem;
+        }
+
+        .name-card p {
+            font-size: 0.875rem;
+            color: var(--muted);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .avail-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.73rem;
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
+
+        .avail-check {
+            background: rgba(0, 229, 160, 0.08);
+            color: var(--accent);
+            border: 1px solid rgba(0, 229, 160, 0.2);
+        }
+
+        .avail-unknown {
+            background: rgba(244, 200, 66, 0.08);
+            color: var(--gold);
+            border: 1px solid rgba(244, 200, 66, 0.2);
+        }
+
+        /* PRICING */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .price-card {
+            background: var(--bg3);
+            border: 1px solid var(--border2);
+            border-radius: 14px;
+            padding: 2rem;
+            transition: border-color 0.2s;
+        }
+
+        .price-card.popular {
+            border-color: var(--accent);
+            position: relative;
+        }
+
+        .popular-badge {
+            position: absolute;
+            top: -1px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent);
+            color: #0a0d12;
+            font-size: 0.68rem;
+            font-weight: 700;
+            font-family: var(--mono);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 4px 14px;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .price-plan {
+            font-size: 0.8rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-family: var(--mono);
+            margin-bottom: 0.8rem;
+        }
+
+        .price-amount {
+            font-family: var(--serif);
+            font-size: 2.8rem;
+            line-height: 1;
+            margin-bottom: 0.3rem;
+        }
+
+        .price-period {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-bottom: 1.5rem;
+        }
+
+        .price-features {
+            list-style: none;
+            margin-bottom: 1.5rem;
+        }
+
+        .price-features li {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-bottom: 0.6rem;
+            line-height: 1.4;
+        }
+
+        .price-features li::before {
+            content: '✓';
+            color: var(--accent);
+            font-size: 0.8rem;
+            margin-top: 1px;
+            flex-shrink: 0;
+        }
+
+        /* HOW IT WORKS */
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0;
+            position: relative;
+        }
+
+        .step {
+            padding: 0 2rem 2rem 0;
+            position: relative;
+        }
+
+        .step-num {
+            font-family: var(--mono);
+            font-size: 0.7rem;
+            color: var(--accent);
+            background: rgba(0, 229, 160, 0.08);
+            border: 1px solid rgba(0, 229, 160, 0.2);
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .step h3 {
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin-bottom: 0.4rem;
+            color: var(--text);
+        }
+
+        .step p {
+            font-size: 0.82rem;
+            color: var(--muted);
+            line-height: 1.65;
+        }
+
+        /* FOOTER */
+        footer {
+            position: relative;
+            z-index: 1;
+            border-top: 1px solid var(--border);
+            padding: 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        footer .logo {
+            font-size: 1.1rem;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .footer-links a {
+            font-size: 0.82rem;
+            color: var(--muted);
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            color: var(--text);
+        }
+
+        .footer-copy {
+            font-size: 0.78rem;
+            color: var(--muted);
+            font-family: var(--mono);
+        }
+
+        /* GLOW ORBS */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.08;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .orb1 {
+            width: 600px;
+            height: 600px;
+            background: var(--accent);
+            top: -200px;
+            right: -200px;
+        }
+
+        .orb2 {
+            width: 400px;
+            height: 400px;
+            background: var(--accent2);
+            bottom: 20%;
+            left: -150px;
+        }
+
+        /* DIVIDER */
+        .divider {
+            width: 100%;
+            height: 1px;
+            background: var(--border);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* TICKER */
+        .ticker-wrap {
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 0.9rem 0;
+            background: var(--bg2);
+        }
+
+        .ticker-track {
+            display: flex;
+            gap: 3rem;
+            animation: ticker 30s linear infinite;
+            white-space: nowrap;
+        }
+
+        @keyframes ticker {
+            from {
+                transform: translateX(0);
+            }
+
+            to {
+                transform: translateX(-50%);
+            }
+        }
+
+        .tick-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--mono);
+            font-size: 0.78rem;
+            color: var(--muted);
+            flex-shrink: 0;
+        }
+
+        .tick-item .up {
+            color: var(--accent);
+        }
+
+        .tick-item .dn {
+            color: #ff6b6b;
+        }
+
+        /* Animated bars in mini chart */
+        @keyframes barUp {
+            from {
+                height: 0;
+            }
+
+            to {
+                height: var(--h);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+
+    <!-- NAV -->
+    <nav>
+        <div class="logo">
+            <span class="logo-dot"></span>
+            StratCanvas
+        </div>
+        <ul class="nav-links">
+            <li><a href="#features">Features</a></li>
+            <li><a href="#how">How it works</a></li>
+            <li><a href="#pricing">Pricing</a></li>
+            <li><a href="#names">About</a></li>
+        </ul>
+        <a href="#" class="nav-cta">Start for free →</a>
+    </nav>
+
+    <!-- TICKER -->
+    <div style="height: 100px;"></div>
+    <div class="ticker-wrap">
+        <div class="ticker-track" id="tickerTrack"></div>
+    </div>
+
+    <!-- HERO -->
+    <div class="hero">
+        <div class="badge">Visual strategy builder</div>
+        <h1>Build. <em>Backtest.</em> Deploy.</h1>
+        <p class="hero-sub">
+            Design automated trading strategies on a drag-and-drop canvas — no code required. Backtest on decades of
+            market data and go live in minutes.
+        </p>
+        <div class="hero-actions">
+            <a href="#" class="btn-primary">Start building free →</a>
+            <a href="#" class="btn-ghost">▶ Watch demo</a>
+        </div>
+        <div class="hero-proof">
+            <span>✦ No credit card required</span>
+            <span>✦ 20+ years of market data</span>
+            <span>✦ Live in minutes</span>
+        </div>
+    </div>
+
+    <!-- CANVAS PREVIEW -->
+    <div class="canvas-preview">
+        <div class="canvas-frame">
+            <div class="canvas-topbar">
+                <div class="traffic-lights">
+                    <div class="tl red"></div>
+                    <div class="tl yellow"></div>
+                    <div class="tl green"></div>
+                </div>
+                <div class="canvas-title">Strategy_001.strat — StratCanvas</div>
+            </div>
+            <div class="canvas-inner">
+
+                <!-- LEFT PANEL -->
+                <div class="panel-left">
+                    <div class="panel-section-label">Indicators</div>
+                    <div class="block-list">
+                        <div class="block-item">
+                            <div class="block-icon bi-green">📈</div>EMA Crossover
+                        </div>
+                        <div class="block-item">
+                            <div class="block-icon bi-green">〰️</div>RSI
+                        </div>
+                        <div class="block-item">
+                            <div class="block-icon bi-green">🔻</div>Bollinger Bands
+                        </div>
+                        <div class="block-item">
+                            <div class="block-icon bi-blue">📊</div>MACD
+                        </div>
+                        <div class="block-item">
+                            <div class="block-icon bi-blue">⚡</div>ATR
+                        </div>
+                    </div>
+                    <div class="panel-section-label">Logic</div>
+                    <div class="block-list">
+                        <div class="block-item">
+                            <div class="block-icon bi-orange">🔀</div>Condition
+                        </div>
+                        <div class="block-item">
+                            <div class="block-icon bi-orange">⚙️</div>Filter
+                        </div>
+                        <div class="block-item">
+                            <div class="block-icon bi-gold">💰</div>Order
+                        </div>
+                        <div class="block-item">
+                            <div class="block-icon bi-gold">🛡</div>Stop Loss
+                        </div>
+                    </div>
+                    <div class="panel-section-label">Data</div>
+                    <div class="block-list">
+                        <div class="block-item">
+                            <div class="block-icon bi-blue">💹</div>Market Feed
+                        </div>
+                        <div class="block-item">
+                            <div class="block-icon bi-blue">📰</div>News Signal
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CANVAS AREA -->
+                <div class="canvas-area">
+                    <!-- Connection lines (SVG) -->
+                    <svg viewBox="0 0 660 440" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Market Feed → EMA -->
+                        <path d="M 195 100 C 240 100 240 155 285 155" fill="none" stroke="rgba(0,229,160,0.3)"
+                            stroke-width="1.5" stroke-dasharray="4,3" />
+                        <!-- EMA → Condition -->
+                        <path d="M 430 155 C 465 155 465 230 390 230" fill="none" stroke="rgba(0,229,160,0.3)"
+                            stroke-width="1.5" />
+                        <!-- RSI → Condition -->
+                        <path d="M 430 285 C 450 285 450 260 455 250 C 460 240 460 240 455 240" fill="none"
+                            stroke="rgba(0,170,255,0.3)" stroke-width="1.5" stroke-dasharray="4,3" />
+                        <!-- Condition → Order -->
+                        <path d="M 530 237 C 560 237 565 310 540 320" fill="none" stroke="rgba(244,200,66,0.35)"
+                            stroke-width="2" />
+                        <!-- Order → Stop Loss -->
+                        <path d="M 540 355 C 540 380 450 385 400 385" fill="none" stroke="rgba(255,107,53,0.3)"
+                            stroke-width="1.5" stroke-dasharray="3,3" />
+                    </svg>
+
+                    <!-- Nodes -->
+                    <div class="nodes-layer">
+
+                        <!-- Market Feed -->
+                        <div class="node" style="left: 40px; top: 68px;">
+                            <div class="node-header">
+                                <div class="node-dot nd-blue"></div>Market Feed
+                            </div>
+                            <div class="node-param"><span>Symbol</span><span class="val">BTCUSDT</span></div>
+                            <div class="node-param"><span>Timeframe</span><span class="val">1H</span></div>
+                            <div class="node-param"><span>OHLCV</span><span class="val">live</span></div>
+                        </div>
+
+                        <!-- EMA Crossover (active) -->
+                        <div class="node node-active" style="left: 280px; top: 110px;">
+                            <div class="node-header">
+                                <div class="node-dot nd-green"></div>EMA Crossover
+                            </div>
+                            <div class="node-param"><span>Fast</span><span class="val">9</span></div>
+                            <div class="node-param"><span>Slow</span><span class="val">21</span></div>
+                            <div class="node-param"><span>Signal</span><span class="val">CROSS↑</span></div>
+                        </div>
+
+                        <!-- RSI -->
+                        <div class="node" style="left: 280px; top: 250px;">
+                            <div class="node-header">
+                                <div class="node-dot nd-blue"></div>RSI Filter
+                            </div>
+                            <div class="node-param"><span>Period</span><span class="val">14</span></div>
+                            <div class="node-param"><span>Oversold</span><span class="val">&lt; 35</span></div>
+                        </div>
+
+                        <!-- Condition -->
+                        <div class="node" style="left: 440px; top: 195px;">
+                            <div class="node-header">
+                                <div class="node-dot nd-orange"></div>AND Gate
+                            </div>
+                            <div class="node-param"><span>Inputs</span><span class="val">2 / 2</span></div>
+                            <div class="node-param"><span>Output</span><span class="val">BUY</span></div>
+                        </div>
+
+                        <!-- Order -->
+                        <div class="node" style="left: 420px; top: 305px;">
+                            <div class="node-header">
+                                <div class="node-dot nd-gold"></div>Market Order
+                            </div>
+                            <div class="node-param"><span>Side</span><span class="val">LONG</span></div>
+                            <div class="node-param"><span>Size</span><span class="val">2% equity</span></div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- RIGHT PANEL -->
+                <div class="panel-right">
+                    <div class="panel-section-label">Backtest</div>
+                    <div class="stat-mini">
+                        <div class="stat-mini-label">Total return</div>
+                        <div class="stat-mini-val">+147.3%</div>
+                    </div>
+                    <div class="stat-mini">
+                        <div class="stat-mini-label">Sharpe ratio</div>
+                        <div class="stat-mini-val">2.14</div>
+                    </div>
+                    <div class="stat-mini">
+                        <div class="stat-mini-label">Max drawdown</div>
+                        <div class="stat-mini-val neg">-12.8%</div>
+                    </div>
+                    <div class="stat-mini">
+                        <div class="stat-mini-label">Win rate</div>
+                        <div class="stat-mini-val">68.4%</div>
+                    </div>
+                    <div class="stat-mini">
+                        <div class="stat-mini-label">Profit factor</div>
+                        <div class="stat-mini-val">2.87</div>
+                    </div>
+                    <div class="panel-section-label" style="margin-top:1rem;">Equity curve</div>
+                    <svg viewBox="0 0 170 55" class="mini-chart" xmlns="http://www.w3.org/2000/svg">
+                        <polyline
+                            points="0,50 15,46 25,42 35,44 50,36 60,30 70,28 80,22 95,18 105,20 115,14 130,8 145,6 160,3 170,1"
+                            fill="none" stroke="#00e5a0" stroke-width="1.5" stroke-linejoin="round" />
+                        <polyline
+                            points="0,50 15,46 25,42 35,44 50,36 60,30 70,28 80,22 95,18 105,20 115,14 130,8 145,6 160,3 170,1 170,55 0,55"
+                            fill="rgba(0,229,160,0.07)" />
+                    </svg>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- HOW IT WORKS -->
+    <section id="how">
+        <div class="section-label">How it works</div>
+        <h2>From idea to <em>live strategy</em> in four steps</h2>
+        <p class="section-sub">No Python. No pinescript. No guessing. Just drag, connect, test, deploy.</p>
+        <div class="steps">
+            <div class="step">
+                <div class="step-num">01</div>
+                <h3>Build on the canvas</h3>
+                <p>Drag indicators, conditions, and order blocks onto an infinite canvas and wire them together
+                    visually.</p>
+            </div>
+            <div class="step">
+                <div class="step-num">02</div>
+                <h3>Configure parameters</h3>
+                <p>Click any node to set values. Period lengths, thresholds, position sizing — all in plain forms.</p>
+            </div>
+            <div class="step">
+                <div class="step-num">03</div>
+                <h3>Backtest instantly</h3>
+                <p>Run your strategy against 20+ years of historical OHLCV data across equities, crypto, and forex.
+                    Results in seconds.</p>
+            </div>
+            <div class="step">
+                <div class="step-num">04</div>
+                <h3>Deploy live</h3>
+                <p>Connect your broker API and flip the switch. StratCanvas handles execution, monitoring, and alerting.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- FEATURES -->
+    <section id="features">
+        <div class="section-label">Features</div>
+        <h2>Everything you need, <em>nothing you don't</em></h2>
+        <p class="section-sub">Purpose-built for quants, independent traders, and algo enthusiasts who want results —
+            not complexity.</p>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon bi-green">📐</div>
+                <h3>Visual strategy builder</h3>
+                <p>An infinite canvas with 40+ built-in indicators and logic blocks. Wire conditions, filters, and
+                    orders like drawing a flowchart.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon bi-blue">⚡</div>
+                <h3>Instant backtesting</h3>
+                <p>Sub-second backtests across decades of tick-level data. Walk-forward analysis, Monte Carlo
+                    simulation, and out-of-sample splits built in.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon bi-gold">🛡</div>
+                <h3>Risk management</h3>
+                <p>Add stop-loss, take-profit, trailing stops, and position sizing blocks. Visualize max drawdown and
+                    risk-adjusted returns in real time.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon bi-orange">🔌</div>
+                <h3>Broker integrations</h3>
+                <p>Connect to Interactive Brokers, Alpaca, Binance, Kraken, and 12+ others via OAuth. Execute trades
+                    without leaving the canvas.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon bi-green">🔁</div>
+                <h3>Auto-optimisation</h3>
+                <p>Grid search or Bayesian optimisation over your parameter space. Find the best configuration without
+                    overfitting — CAGR, Sharpe, Calmar.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon bi-blue">👥</div>
+                <h3>Strategy marketplace</h3>
+                <p>Publish your strategies and earn passive income. Buy proven strategies from top performers — full
+                    transparency on live track records.</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- NAME PROPOSALS -->
+    <section id="names">
+        <div class="section-label">Name proposals</div>
+        <h2>Three names worth owning</h2>
+        <p class="section-sub">Each concept, its domain status, and what it conveys — so you can pick the one that fits
+            your vision.</p>
+        <div class="names-grid">
+
+            <div class="name-card featured">
+                <span class="name-tag tag-best">★ Top pick</span>
+                <h3>StratCanvas</h3>
+                <div class="domain">stratcanvas.io</div>
+                <p>Merges <em>strategy</em> and <em>canvas</em> directly — explains the product in the name. Clean,
+                    memorable, brandable. The .io extension signals SaaS credibility to a technical audience.</p>
+                <span class="avail-badge avail-check">● Likely available — no search results found</span>
+            </div>
+
+            <div class="name-card">
+                <span class="name-tag tag-alt">Alternative</span>
+                <h3>AlgoFlow</h3>
+                <div class="domain">algoflow.io</div>
+                <p>Emphasises the <em>flow-based</em> visual programming paradigm. Strong positioning against code-first
+                    tools. "Algo" resonates with the quant community immediately.</p>
+                <span class="avail-badge avail-unknown">⚠ Verify on Namecheap / GoDaddy</span>
+            </div>
+
+            <div class="name-card">
+                <span class="name-tag tag-alt">Alternative</span>
+                <h3>SignalForge</h3>
+                <div class="domain">signalforge.io</div>
+                <p>Positions the product as a <em>maker of signals</em> — powerful verb (forge), trading noun (signal).
+                    Great for a brand that wants to feel professional and craft-oriented.</p>
+                <span class="avail-badge avail-unknown">⚠ Verify on Namecheap / GoDaddy</span>
+            </div>
+
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- PRICING -->
+    <section id="pricing">
+        <div class="section-label">Pricing</div>
+        <h2>Simple pricing, <em>no surprises</em></h2>
+        <p class="section-sub">Start free. Pay only when you're ready to go live. Cancel any time.</p>
+        <div class="pricing-grid">
+
+            <div class="price-card">
+                <div class="price-plan">Starter</div>
+                <div class="price-amount">$0</div>
+                <div class="price-period">Forever free</div>
+                <ul class="price-features">
+                    <li>Up to 3 strategies</li>
+                    <li>5 years of backtest data</li>
+                    <li>Basic indicators (12)</li>
+                    <li>Paper trading mode</li>
+                    <li>Community access</li>
+                </ul>
+                <a href="#" class="btn-ghost" style="width:100%; text-align:center; justify-content:center;">Get
+                    started</a>
+            </div>
+
+            <div class="price-card popular">
+                <div class="popular-badge">Most popular</div>
+                <div class="price-plan">Pro</div>
+                <div class="price-amount">$49</div>
+                <div class="price-period">per month, billed annually</div>
+                <ul class="price-features">
+                    <li>Unlimited strategies</li>
+                    <li>20+ years of data (all assets)</li>
+                    <li>All 40+ indicators + custom</li>
+                    <li>Live trading (1 broker)</li>
+                    <li>Optimisation engine</li>
+                    <li>Priority support</li>
+                </ul>
+                <a href="#" class="btn-primary" style="width:100%; text-align:center; justify-content:center;">Start Pro
+                    →</a>
+            </div>
+
+            <div class="price-card">
+                <div class="price-plan">Quant</div>
+                <div class="price-amount">$199</div>
+                <div class="price-period">per month, billed annually</div>
+                <ul class="price-features">
+                    <li>Everything in Pro</li>
+                    <li>Multi-broker execution</li>
+                    <li>Portfolio-level backtesting</li>
+                    <li>API & webhook access</li>
+                    <li>White-label for your clients</li>
+                    <li>Dedicated success manager</li>
+                </ul>
+                <a href="#" class="btn-ghost" style="width:100%; text-align:center; justify-content:center;">Contact
+                    sales</a>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="logo"><span class="logo-dot"></span> StratCanvas</div>
+        <ul class="footer-links">
+            <li><a href="#">Privacy</a></li>
+            <li><a href="#">Terms</a></li>
+            <li><a href="#">Docs</a></li>
+            <li><a href="#">Status</a></li>
+        </ul>
+        <div class="footer-copy">© 2026 StratCanvas, Inc.</div>
+    </footer>
+
+    <script>
+        const tickers = [
+            { sym: 'BTC/USDT', val: '67,420', chg: '+2.4%', up: true },
+            { sym: 'ETH/USDT', val: '3,580', chg: '+1.8%', up: true },
+            { sym: 'AAPL', val: '214.30', chg: '-0.3%', up: false },
+            { sym: 'TSLA', val: '182.50', chg: '+4.1%', up: true },
+            { sym: 'SPY', val: '530.10', chg: '+0.7%', up: true },
+            { sym: 'GLD', val: '218.70', chg: '+0.2%', up: true },
+            { sym: 'EUR/USD', val: '1.0842', chg: '-0.1%', up: false },
+            { sym: 'SOL/USDT', val: '158.20', chg: '+5.2%', up: true },
+            { sym: 'NVDA', val: '875.40', chg: '+3.3%', up: true },
+            { sym: 'GBP/USD', val: '1.2640', chg: '-0.4%', up: false },
+        ];
+
+        const track = document.getElementById('tickerTrack');
+        const allTickers = [...tickers, ...tickers];
+        allTickers.forEach(t => {
+            const el = document.createElement('span');
+            el.className = 'tick-item';
+            el.innerHTML = `<span>${t.sym}</span> <span>${t.val}</span> <span class="${t.up ? 'up' : 'dn'}">${t.chg}</span>`;
+            track.appendChild(el);
+        });
+    </script>
+    <script
+        id="mcjs">!function (c, h, i, m, p) { m = c.createElement(h), p = c.getElementsByTagName(h)[0], m.async = 1, m.src = i, p.parentNode.insertBefore(m, p) }(document, "script", "https://chimpstatic.com/mcjs-connected/js/users/481b1e08e67d658a39b28c88e/a6ea0225657ef893e6098d6df.js");</script>
+</body>
+
+</html>
