@@ -35,7 +35,7 @@ export default function WaitlistPage() {
           />
           Early access · 2,400+ on the list
         </div>
-        <h1 className="mb-5 font-serif text-[clamp(2.1rem,5vw,3.6rem)] leading-[1.08] tracking-tight">
+        <h1 className="mb-5 font-serif font-bold text-[clamp(2.1rem,5vw,3.6rem)] leading-[1.08] tracking-tight">
           Join the{" "}
           <em className="italic text-strat-accent">StratCanvas</em> waitlist
         </h1>

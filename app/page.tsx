@@ -36,7 +36,7 @@ export default function HomePage() {
           />
           Visual strategy builder
         </div>
-        <h1 className="mx-auto mb-6 max-w-[16ch] font-serif text-[clamp(2.6rem,6vw,5.5rem)] leading-[1.05] tracking-tight text-strat-text">
+        <h1 className="mx-auto mb-6 max-w-[16ch] font-serif font-bold text-[clamp(2.6rem,6vw,5.5rem)] leading-[1.05] tracking-tight text-strat-text">
           Build. <em className="italic text-strat-accent">Backtest.</em>{" "}
           Deploy.
         </h1>

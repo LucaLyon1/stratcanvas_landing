@@ -32,7 +32,7 @@ export default function LeadMagnetPage() {
         <div className="mb-6 inline-flex items-center gap-1.5 rounded-full border border-strat-accent/20 bg-strat-accent/10 px-3.5 py-1.5 font-mono text-[0.72rem] font-medium uppercase tracking-[0.08em] text-strat-accent">
           Free download · PDF
         </div>
-        <h1 className="mb-4 font-serif text-[clamp(2rem,5vw,3.25rem)] leading-tight tracking-tight">
+        <h1 className="mb-4 font-serif font-bold text-[clamp(2rem,5vw,3.25rem)] leading-tight tracking-tight">
           The{" "}
           <em className="italic text-strat-accent">Visual Algo Starter</em>{" "}
           Checklist
@@ -64,7 +64,7 @@ export default function LeadMagnetPage() {
         </div>
 
         <div className="rounded-2xl border border-strat-accent/25 bg-gradient-to-br from-strat-accent/12 to-strat-bg3 p-7 sm:p-8">
-          <h2 className="mb-2 font-serif text-2xl tracking-tight text-strat-text">
+          <h2 className="mb-2 font-serif font-semibold text-2xl tracking-tight text-strat-text">
             Send me the checklist
           </h2>
           <p className="mb-6 text-sm text-strat-muted">

@@ -30,7 +30,7 @@ export function SocialProof() {
             key={s.label}
             className="flex flex-col items-center gap-1 bg-strat-bg px-6 py-7 text-center"
           >
-            <div className="font-serif text-2xl tracking-tight text-strat-text md:text-3xl">
+            <div className="font-serif font-semibold text-2xl tracking-tight text-strat-text md:text-3xl">
               {s.value}
             </div>
             <div className="font-mono text-[0.7rem] uppercase tracking-[0.08em] text-strat-muted">
@@ -72,7 +72,7 @@ export function HowItWorks() {
       className="relative z-[1] mx-auto max-w-[1100px] px-6 py-24 sm:px-8"
     >
       <SectionLabel>How it works</SectionLabel>
-      <h2 className="mb-4 font-serif text-[clamp(2rem,4vw,3rem)] leading-tight tracking-tight md:max-w-[20ch]">
+      <h2 className="mb-4 font-serif font-bold text-[clamp(2rem,4vw,3rem)] leading-tight tracking-tight md:max-w-[20ch]">
         From idea to{" "}
         <em className="italic text-strat-muted">live strategy</em> in four steps
       </h2>
@@ -154,7 +154,7 @@ export function Features() {
       className="relative z-[1] mx-auto max-w-[1100px] px-6 py-24 sm:px-8"
     >
       <SectionLabel>Features</SectionLabel>
-      <h2 className="mb-4 font-serif text-[clamp(2rem,4vw,3rem)] leading-tight tracking-tight md:max-w-[20ch]">
+      <h2 className="mb-4 font-serif font-bold text-[clamp(2rem,4vw,3rem)] leading-tight tracking-tight md:max-w-[20ch]">
         Everything you need,{" "}
         <em className="italic text-strat-muted">nothing you don&apos;t</em>
       </h2>
@@ -238,7 +238,7 @@ export function Pricing() {
       className="relative z-[1] mx-auto max-w-[1100px] px-6 py-24 sm:px-8"
     >
       <SectionLabel>Pricing</SectionLabel>
-      <h2 className="mb-4 font-serif text-[clamp(2rem,4vw,3rem)] leading-tight tracking-tight md:max-w-[20ch]">
+      <h2 className="mb-4 font-serif font-bold text-[clamp(2rem,4vw,3rem)] leading-tight tracking-tight md:max-w-[20ch]">
         Simple pricing,{" "}
         <em className="italic text-strat-muted">no surprises</em>
       </h2>
@@ -266,7 +266,7 @@ export function Pricing() {
             >
               {t.name}
             </div>
-            <div className="font-serif text-[2.8rem] leading-none">
+            <div className="font-serif font-semibold text-[2.8rem] leading-none">
               {t.price}
             </div>
             <div className="mb-6 text-[0.8rem] text-strat-muted">
@@ -368,7 +368,7 @@ export function Faq() {
       className="relative z-[1] mx-auto max-w-[820px] px-6 py-24 sm:px-8"
     >
       <SectionLabel>FAQ</SectionLabel>
-      <h2 className="mb-4 font-serif text-[clamp(2rem,4vw,3rem)] leading-tight tracking-tight">
+      <h2 className="mb-4 font-serif font-bold text-[clamp(2rem,4vw,3rem)] leading-tight tracking-tight">
         Questions, <em className="italic text-strat-muted">answered</em>
       </h2>
       <p className="mb-10 max-w-[55ch] text-[1.05rem] font-light leading-relaxed text-strat-muted">
@@ -401,7 +401,7 @@ export function FinalCta() {
             <span className="size-1.5 animate-pulse rounded-full bg-strat-accent" />
             Limited beta cohort
           </div>
-          <h2 className="mb-4 font-serif text-[clamp(2rem,4.4vw,3.25rem)] leading-tight tracking-tight">
+          <h2 className="mb-4 font-serif font-bold text-[clamp(2rem,4.4vw,3.25rem)] leading-tight tracking-tight">
             Stop coding strategies.{" "}
             <em className="italic text-strat-accent">Start drawing them.</em>
           </h2>
