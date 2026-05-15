@@ -20,6 +20,9 @@ export const metadata: Metadata = {
   title: "StratCanvas — Build & Backtest Trading Strategies Visually",
   description:
     "Design automated trading strategies on a drag-and-drop canvas — no code required.",
+  icons: {
+    icon: "/icon.png",
+  },
 };
 
 export default function RootLayout({
